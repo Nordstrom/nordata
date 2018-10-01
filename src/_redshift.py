@@ -59,6 +59,7 @@ def redshift_execute_sql(sql, env_var, return_data=False):
     list of tuples or None
         TODO dig into data types
     """
+    # TODO is there a way to clean this up?
     try:
         with redshift_get_conn(env_var=env_var) as conn:
             with conn.cursor() as cursor:

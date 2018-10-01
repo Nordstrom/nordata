@@ -1,10 +1,7 @@
 import boto3
 
 
-def create_session(
-        profile_name='default',
-        region_name='us-west-2',
-):
+def create_session(profile_name='default', region_name='us-west-2'):
     """ Instantiates and returns a boto3 session object
 
     Parameters
@@ -21,11 +18,7 @@ def create_session(
     return boto3.session.Session(profile_name=profile_name, region_name=region_name)
 
 
-def _s3_get_creds(
-        profile_name='default',
-        region_name='us-west-2',
-        session=None,
-):
+def _s3_get_creds(profile_name='default', region_name='us-west-2', session=None):
     """ Generates and returns an S3 credential string
 
     Parameters
@@ -51,12 +44,8 @@ def _s3_get_creds(
     return 'aws_access_key_id={access_key};aws_secret_access_key={secret_key};token={token}'.format(**creds_dict)
 
 
-def s3_get_bucket(
-        bucket,
-        profile_name='default',
-        verbose=False,
-):
-    """
+def s3_get_bucket(bucket, profile_name='default', verbose=False):
+    """ TODO
 
     Parameters
     ----------
@@ -110,6 +99,7 @@ def s3_download_file(
     -------
     None
     """
+    # TODO
     return
 
 
@@ -146,6 +136,7 @@ def s3_upload_file(
     -------
     None
     """
+    # TODO
     return
 
 
@@ -156,7 +147,7 @@ def s3_delete_file(
         profile_name='default',
         verbose=False
     ):
-    """
+    """ TODO
 
     Parameters
     ----------
@@ -176,4 +167,5 @@ def s3_delete_file(
     -------
     None
     """
+    # TODO
     return

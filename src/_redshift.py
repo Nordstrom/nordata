@@ -1,64 +1,24 @@
-from _s3 import create_session
+import os
 import psycopg2
 
 
-def store_creds(
-        host,
-        dbname,
-        port,
-        user,
-        password,
-        profile_name='default',
-        region_name='us-west-2',
-):
-    """
-
-    Parameters
-    ----------
-    host
-    dbname
-    port
-    user
-    password
-    profile_name
-    region_name
-
-    Returns
-    -------
-
-    """
-    creds_str = f'ENDPOINT={host};PORT={port};DB={dbname};USER={user};PASS={password}'
-    session = create_session(profile_name=profile_name, region_name=region_name)
-    client = session.client('kms')
-    return
-
-
-def redshift_get_conn(
-        json_path,
-        database_key,
-):
+def redshift_get_conn(env_var):
     """ Creates a Redshift connection object
 
     Parameters
     ----------
-    json_path : str
-        path to and name of the credentials json file
-    database_key : str
-        key for the database and account in the credentials json file
+    env_var : str
+        name of the environment variable containing the credentials str
+        creds_str should have the below format where the user has inserted their values:
+        'host=my_hostname dbname=my_dbname user=my_user password=my_password port=1234'
 
     Returns
     -------
     psycopg2 connection object
     """
-    with open(json_path, 'r') as f:
-        cfg = json.load(f)
-    conn = psycopg2.connect(
-        host=cfg[database_key]['host'],
-        dbname=cfg[database_key]['dbname'],
-        password=cfg[database_key]['password'],
-        port=int(cfg[database_key]['port']),
-        user=cfg[database_key]['user'],
-    )
+    cred_str = os.environ[env_var]
+    creds_dict = _create_creds_dict(cred_str)
+    conn = psycopg2.connect(**creds_dict)
     return conn
 
 
@@ -80,22 +40,17 @@ def redshift_read_sql(sql_filename):
     return sql_str
 
 
-def redshift_execute_sql(
-        sql,
-        json_path,
-        database_key,
-        return_data=False,
-):
+def redshift_execute_sql(sql, env_var, return_data=False):
     """ Ingests a SQL query as a string and executes it (potentially returning data)
 
     Parameters
     ----------
     sql : str
         SQL query to be executed
-    json_path : str
-        path to and name of the credentials json file
-    database_key : str
-        key for the database and account in the credentials json file
+    env_var : str
+        name of the environment variable containing the credentials str
+        creds_str should have the below format where the user has inserted their values:
+        'host=my_hostname dbname=my_dbname user=my_user password=my_password port=1234'
     return_data : bool
         whether or not the query should return data
 
@@ -105,7 +60,7 @@ def redshift_execute_sql(
         TODO dig into data types
     """
     try:
-        with redshift_get_conn(json_path=json_path, database_key=database_key) as conn:
+        with redshift_get_conn(env_var=env_var) as conn:
             with conn.cursor() as cursor:
                 cursor.execute(sql)
                 if return_data:
@@ -121,3 +76,23 @@ def redshift_execute_sql(
     except Exception as e:
         raise RuntimeError('SQL error = {0}'.format(e))
 
+
+def _create_creds_dict(creds_str):
+    """ Takes the credentials str and converts it to a dict
+
+    Parameters
+    ----------
+    creds_str : str
+        credentials string with the below format where the user has inserted their values:
+        'host=my_hostname dbname=my_dbname user=my_user password=my_password port=1234'
+
+    Returns
+    -------
+    dict
+        credentials in dict form
+    """
+    creds_dict = {}
+    for param in creds_str.split(' '):
+        split_param = param.split('=')
+        creds_dict[split_param[0]] = split_param[1]
+    return creds_dict

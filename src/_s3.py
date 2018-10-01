@@ -54,7 +54,7 @@ def _s3_get_creds(
 def s3_get_bucket(
         bucket,
         profile_name='default',
-        verbose=False
+        verbose=False,
 ):
     """
 

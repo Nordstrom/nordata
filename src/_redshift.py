@@ -1,8 +1,42 @@
-import json
+from _s3 import create_session
 import psycopg2
 
 
-def redshift_get_conn(json_path, database_key):
+def store_creds(
+        host,
+        dbname,
+        port,
+        user,
+        password,
+        profile_name='default',
+        region_name='us-west-2',
+):
+    """
+
+    Parameters
+    ----------
+    host
+    dbname
+    port
+    user
+    password
+    profile_name
+    region_name
+
+    Returns
+    -------
+
+    """
+    creds_str = f'ENDPOINT={host};PORT={port};DB={dbname};USER={user};PASS={password}'
+    session = create_session(profile_name=profile_name, region_name=region_name)
+    client = session.client('kms')
+    return
+
+
+def redshift_get_conn(
+        json_path,
+        database_key,
+):
     """ Creates a Redshift connection object
 
     Parameters
@@ -46,7 +80,12 @@ def redshift_read_sql(sql_filename):
     return sql_str
 
 
-def redshift_execute_sql(sql, json_path, database_key, return_data=False):
+def redshift_execute_sql(
+        sql,
+        json_path,
+        database_key,
+        return_data=False,
+):
     """ Ingests a SQL query as a string and executes it (potentially returning data)
 
     Parameters

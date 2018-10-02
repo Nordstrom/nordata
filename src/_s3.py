@@ -1,4 +1,5 @@
 import boto3
+import botocore
 
 
 def create_session(profile_name='default', region_name='us-west-2'):
@@ -36,34 +37,43 @@ def _s3_get_creds(profile_name='default', region_name='us-west-2', session=None)
     """
     if session is None:
         session = create_session(profile_name=profile_name, region_name=region_name)
-    creds_dict = {
-        'access_key': session.get_credentials().access_key,
-        'secret_key': session.get_credentials().secret_key,
-        'token': session.get_credentials().token,
-    }
-    return 'aws_access_key_id={access_key};aws_secret_access_key={secret_key};token={token}'.format(**creds_dict)
+    access_key = session.get_credentials().access_key,
+    secret_key = session.get_credentials().secret_key,
+    token = session.get_credentials().token,
+    return f'aws_access_key_id={access_key};aws_secret_access_key={secret_key};token={token}'
 
 
-def s3_get_bucket(bucket, profile_name='default', verbose=False):
+def s3_get_bucket(bucket, profile_name='default', region_name='us-west-2'):
     """ TODO
 
     Parameters
     ----------
-    # TODO change to also accept object
     bucket : str
         name of S3 bucket
     profile_name: str
         profile name for credentials (typically default or organization-specific)
-    verbose : bool
-        whether or not to indicate progress
+    region_name : str
+        name of AWS regions (typically 'us-west-2')
 
     Returns
     -------
     # TODO check type
     boto3 bucket object
     """
-    creds = _s3_get_creds(profile_name=profile_name)
-    return bucket
+    session = create_session(profile_name=profile_name, region_name=region_name)
+    s3 = session.resource('s3')
+    my_bucket = s3.Bucket(bucket)
+    try:
+        s3.meta.client.head_bucket(Bucket=bucket)
+    except botocore.exceptions.ClientError as e:
+        # Check if bucket exists, if not raise error
+        error_code = int(e.response['Error']['Code'])
+        if error_code == 404:
+            raise NameError('404 bucket does not exist')
+        if error_code == 400:
+            raise NameError('If running locally, you must run awscreds in the background.')
+    return my_bucket
+
 
 
 def s3_download_file(

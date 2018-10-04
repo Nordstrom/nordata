@@ -1,0 +1,21 @@
+################################################################################
+# This requirements file has been automatically generated from `Pipfile` with
+# `pipenv-to-requirements`
+#
+#
+# This has been done to maintain backward compatibility with tools and services
+# that do not support `Pipfile` yet.
+#
+# Do NOT edit it directly, use `pipenv install [-d]` to modify `Pipfile` and
+# `Pipfile.lock` and then regenerate `requirements*.txt`.
+################################################################################
+
+boto3==1.9.16
+botocore==1.12.16
+docutils==0.14
+jmespath==0.9.3
+psycopg2-binary==2.7.5
+python-dateutil==2.7.3
+s3transfer==0.1.13
+six==1.11.0
+urllib3==1.23

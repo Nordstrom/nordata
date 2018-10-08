@@ -44,7 +44,7 @@ def _s3_get_creds(profile_name='default', region_name='us-west-2', session=None)
 
 
 def s3_get_bucket(bucket, profile_name='default', region_name='us-west-2'):
-    """ TODO
+    """ Creates and returns a boto3 bucket object
 
     Parameters
     ----------
@@ -57,7 +57,6 @@ def s3_get_bucket(bucket, profile_name='default', region_name='us-west-2'):
 
     Returns
     -------
-    # TODO check type
     boto3 bucket object
     """
     session = create_session(profile_name=profile_name, region_name=region_name)
@@ -69,9 +68,9 @@ def s3_get_bucket(bucket, profile_name='default', region_name='us-west-2'):
         # Check if bucket exists, if not raise error
         error_code = int(e.response['Error']['Code'])
         if error_code == 404:
-            raise NameError('404 bucket does not exist')
+            raise NameError('404 Bucket does not exist')
         if error_code == 400:
-            raise NameError('If running locally, you must run awscreds in the background.')
+            raise NameError('400 The credentials were expired or incorrect.')
     return my_bucket
 
 
@@ -85,11 +84,10 @@ def s3_download_file(
         profile_name='default',
         verbose=False
     ):
-    """
+    """ Downloads a file or collection of files from S3
 
     Parameters
     ----------
-    # TODO change to also accept object
     bucket : str
         name of S3 bucket
     s3_filepath : str
@@ -122,11 +120,10 @@ def s3_upload_file(
         profile_name='default',
         verbose=False
     ):
-    """
+    """ Uploads a file or collection of files to S3
 
     Parameters
     ----------
-    # TODO change to also accept object
     bucket : str
         name of S3 bucket
     local_filepath : str
@@ -157,11 +154,10 @@ def s3_delete_file(
         profile_name='default',
         verbose=False
     ):
-    """ TODO
+    """ Deletes a file or collection of files from S3
 
     Parameters
     ----------
-    # TODO change to also accept object
     bucket : str
         name of S3 bucket
     s3_filepath : str

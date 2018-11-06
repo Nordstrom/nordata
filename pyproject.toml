@@ -7,4 +7,10 @@ module = "nordata"
 author = "Nick Buker"
 author-email = "nick.buker@nordstrom.net"
 home-page = "https://github.com/nickbuker/nordata"
+requires = [
+    "boto3 >=1.9.38",
+    "psycopg2-binary >=2.7.5",
+]
+requires-python = ">=3.6,<4"
+description-file = "README.md"
 classifiers = ["License :: OSI Approved :: Apache Software License"]

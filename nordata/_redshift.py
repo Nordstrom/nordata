@@ -43,7 +43,8 @@ def redshift_read_sql(sql_filename):
 def redshift_execute_sql(
         sql,
         env_var,
-        return_data=False):
+        return_data=False,
+        return_dict=False):
     """ Ingests a SQL query as a string and executes it (potentially returning data)
 
     Parameters
@@ -56,6 +57,8 @@ def redshift_execute_sql(
         'host=my_hostname dbname=my_dbname user=my_user password=my_password port=1234'
     return_data : bool
         whether or not the query should return data
+    return_dict : bool
+        TODO
 
     Returns
     -------
@@ -68,10 +71,13 @@ def redshift_execute_sql(
             with conn.cursor() as cursor:
                 cursor.execute(sql)
                 if return_data:
-                    header = [desc[0] for desc in cursor.description]
+                    columns = [desc[0] for desc in cursor.description]
                     data = [row for row in cursor]
                     conn.commit()
-                    return data, header
+                    if return_dict:
+                        return {'data': data, 'columns': columns}
+                    else:
+                        return data, columns
                 else:
                     conn.commit()
                     return

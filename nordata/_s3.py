@@ -216,21 +216,22 @@ def s3_upload(
     Example use
     -----------
     # to upload a single file
-    s3_upload(bucket='persis-datalab-team',
-              s3_filepath='tmp/myfile.csv',
-              filepath='..data/myfile.csv',
-              environment='local')
+    s3_upload(
+        bucket='my_bucket',
+        s3_filepath='tmp/my_file.csv',
+        filepath='..data/my_file.csv')
 
     # to upload all files in a directory (will not upload contents of subdirectories)
-    s3_upload(bucket='persis-datalab-team',
-              s3_filepath='tmp/',
-              filepath='..data/*',
-              environment='local')
+    s3_upload(
+        bucket='my_bucket',
+        s3_filepath='tmp/',
+        filepath='..data/*')
 
     # to upload all files in a directory matching a wildcard (will not upload contents of subdirectories)
-    s3_upload(bucket='persis-datalab-team',
-              s3_filepath='tmp/',
-              filepath='../data/*.csv')
+    s3_upload(
+        bucket='my_bucket',
+        s3_filepath='tmp/',
+        filepath='../data/*.csv')
     """
     # TODO check that permission is a proper type
     if type(s3_filepath) == list:
@@ -289,11 +290,11 @@ def s3_delete(
     Example use
     -----------
     # Delete a single item:
-    resp = nordypy.s3_delete(bucket='my_bucket', s3_filepath='file1.txt')
+    resp = s3_delete(bucket='my_bucket', s3_filepath='file1.txt')
 
     # Delete multiple items:
     to_delete = ['file1.txt', 'image.png', 'model.pkl']
-    resp = nordypy.s3_delete(bucket='my_bucket', s3_filepath=to_delete)
+    resp = s3_delete(bucket='my_bucket', s3_filepath=to_delete)
 
     # Delete all files matching a pattern:
     TODO

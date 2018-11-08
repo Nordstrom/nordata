@@ -4,15 +4,15 @@ __version__ = '0.1'
 
 
 # Redshift functions
-from _redshift import redshift_get_conn
-from _redshift import redshift_read_sql
-from _redshift import redshift_execute_sql
+from ._redshift import redshift_get_conn
+from ._redshift import redshift_read_sql
+from ._redshift import redshift_execute_sql
 # S3 functions
-from _s3 import create_session
-from _s3 import s3_get_bucket
-from _s3 import s3_download_file
-from _s3 import s3_upload_file
-from _s3 import s3_delete_file
+from ._s3 import create_session
+from ._s3 import s3_get_bucket
+from ._s3 import s3_download
+from ._s3 import s3_upload
+from ._s3 import s3_delete
 
 
 __all__ = ['_redshift', '_s3']

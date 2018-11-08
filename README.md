@@ -28,8 +28,7 @@ nd.redshift_execute_sql(
     sql=sql,
     env_var='REDSHIFT_CREDS',
     return_data=False,
-    return_dict=False,
-)
+    return_dict=False)
 ```
 
 ```python
@@ -37,8 +36,7 @@ data, columns = nd.redshift_execute_sql(
     sql=sql,
     env_var='REDSHIFT_CREDS',
     return_data=True,
-    return_dict=False,
-)
+    return_dict=False)
 ```
 
 ```python
@@ -50,8 +48,7 @@ df = pd.DataFrame(**nd.redshift_execute_sql(
     sql=sql,
     env_var='REDSHIFT_CREDS',
     return_data=True,
-    return_dict=True,
-))
+    return_dict=True))
 ```
 
 ```python

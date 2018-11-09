@@ -1,3 +1,4 @@
+# TODO type hinting?
 import os
 import psycopg2
 
@@ -15,6 +16,10 @@ def redshift_get_conn(env_var):
     Returns
     -------
     psycopg2 connection object
+
+    Example use
+    -----------
+    conn = redshift_get_conn(env_var='REDSHIFT_CREDS')
     """
     cred_str = os.environ[env_var]
     creds_dict = _create_creds_dict(cred_str)
@@ -22,7 +27,7 @@ def redshift_get_conn(env_var):
     return conn
 
 
-def redshift_read_sql(sql_filename):
+def read_sql(sql_filename):
     """ Ingests a SQL file and returns a str containing the contents of the file
 
     Parameters
@@ -34,6 +39,10 @@ def redshift_read_sql(sql_filename):
     -------
     str
         contents of the SQL file ingested
+
+    Example use
+    -----------
+    sql = read_sql(sql_filename='../sql/my_script.sql')
     """
     with open(sql_filename, 'r') as f:
         sql_str = ' '.join(f.readlines())
@@ -58,14 +67,39 @@ def redshift_execute_sql(
     return_data : bool
         whether or not the query should return data
     return_dict : bool
-        TODO
+        whether or not to return data as a dict (for easy ingestion into pandas)
 
     Returns
     -------
-    list of tuples or None
-        TODO dig into data types
+    None or list of str and list of tuples or dict
+        if not return_data then None
+        if return_data and not return_dict then list of str (column names) and list of tuples (data)
+        if return_data and return_dict then dict with keys 'columns' and 'data' with values from above
+
+    Example use
+    -----------
+    # Statement that does not return data (creating/dropping tables or copying/unloading data, etc)
+    redshift_execute_sql(
+        sql=sql,
+        env_var='REDSHIFT_CREDS',
+        return_data=False,
+        return_dict=False)
+
+    # Return data as a list of tuples and the columns as a list of str
+    data, columns = redshift_execute_sql(
+        sql=sql,
+        env_var='REDSHIFT_CREDS',
+        return_data=True,
+        return_dict=False)
+
+    # Return data for direct ingestion into pandas
+    import pandas as pd
+    df = pd.DataFrame(**redshift_execute_sql(
+        sql=sql,
+        env_var='REDSHIFT_CREDS',
+        return_data=True,
+        return_dict=True))
     """
-    # TODO is there a way to clean this up?
     try:
         with redshift_get_conn(env_var=env_var) as conn:
             with conn.cursor() as cursor:
@@ -81,8 +115,8 @@ def redshift_execute_sql(
                 else:
                     conn.commit()
                     return
-    except psycopg2.ProgrammingError as p:
-        raise RuntimeError('SQL ProgrammingError! = {0}'.format(p))
+    except psycopg2.ProgrammingError as e:
+        raise RuntimeError('SQL ProgrammingError = {0}'.format(e))
     except Exception as e:
         raise RuntimeError('SQL error = {0}'.format(e))
 

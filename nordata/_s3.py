@@ -322,12 +322,12 @@ def _filepath_validator(s3_filepath, local_filepath):
     for arg in (s3_filepath, local_filepath):
         if not isinstance(arg, (list, str)):
             raise TypeError('Both s3_filepath and local_filepath must be of type str or list')
-        if type(s3_filepath) != type(local_filepath):
-            raise TypeError('Both s3_filepath and local_filepath must be of same type')
-        if isinstance(s3_filepath, list):
-            for f in s3_filepath + local_filepath:
-                if not isinstance(f, str):
-                    raise TypeError('If s3_filepath and local_filepath are lists, they must contain strings')
-            if len(s3_filepath) != len(local_filepath):
-                raise ValueError('The s3_filepath list must the same number of elements as the local_filepath list')
+    if type(s3_filepath) != type(local_filepath):
+        raise TypeError('Both s3_filepath and local_filepath must be of same type')
+    if isinstance(s3_filepath, list):
+        for f in s3_filepath + local_filepath:
+            if not isinstance(f, str):
+                raise TypeError('If s3_filepath and local_filepath are lists, they must contain strings')
+        if len(s3_filepath) != len(local_filepath):
+            raise ValueError('The s3_filepath list must the same number of elements as the local_filepath list')
     return

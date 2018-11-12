@@ -23,7 +23,7 @@ def create_session(profile_name='default', region_name='us-west-2'):
 
     Example use
     -----------
-    TODO
+    session = create_session(profile_name='default', region_name='us-west-2')
     """
     return boto3.session.Session(profile_name=profile_name, region_name=region_name)
 
@@ -47,10 +47,6 @@ def _s3_get_creds(
     -------
     str
         credentials for accessing S3
-
-    Example use
-    -----------
-    TODO
     """
     if session is None:
         session = create_session(profile_name=profile_name, region_name=region_name)
@@ -81,7 +77,10 @@ def s3_get_bucket(
 
     Example use
     -----------
-    TODO
+    bucket = s3_get_bucket(
+        bucket='my_bucket',
+        profile_name='default',
+        region_name='us-west-2')
     """
     session = create_session(profile_name=profile_name, region_name=region_name)
     s3 = session.resource('s3')
@@ -135,19 +134,19 @@ def s3_download(
     s3_download(
         bucket='my_bucket',
         s3_filepath='tmp/my_file.csv',
-        filepath='..data/my_file.csv')
+        filepath='../data/my_file.csv')
 
     # Download all files in a directory (will not upload contents of subdirectories):
     s3_download(
         bucket='my_bucket',
         s3_filepath='tmp/*',
-        filepath='..data/')
+        filepath='../data/')
 
     # Download all files in a directory matching a wildcard (will not download contents of subdirectories):
     s3_download(
         bucket='my_bucket',
         s3_filepath='tmp/*.csv',
-        filepath='..data/')
+        filepath='../data/')
     """
     _filepath_validator(s3_filepath=s3_filepath, local_filepath=local_filepath)
     s3_filepath = [s3_filepath]
@@ -224,13 +223,13 @@ def s3_upload(
     s3_upload(
         bucket='my_bucket',
         s3_filepath='tmp/my_file.csv',
-        filepath='..data/my_file.csv')
+        filepath='../data/my_file.csv')
 
     # to upload all files in a directory (will not upload contents of subdirectories)
     s3_upload(
         bucket='my_bucket',
         s3_filepath='tmp/',
-        filepath='..data/*')
+        filepath='../data/*')
 
     # to upload all files in a directory matching a wildcard (will not upload contents of subdirectories)
     s3_upload(
@@ -294,14 +293,15 @@ def s3_delete(
     resp = s3_delete(bucket='my_bucket', s3_filepath='file1.txt')
 
     # Delete multiple items:
-    to_delete = ['file1.txt', 'image.png', 'model.pkl']
-    resp = s3_delete(bucket='my_bucket', s3_filepath=to_delete)
+    resp = s3_delete(
+        bucket='my_bucket',
+        s3_filepath=['tmp/my_file1.csv', 'tmp/my_file2.csv', 'img.png'])
 
     # Delete all files matching a pattern:
-    TODO
+    resp = s3_delete(bucket='my_bucket', s3_filepath='tmp/*.csv')
 
     # Delete all files in an S3 directory:
-    TODO
+    resp = s3_delete(bucket='my_bucket', s3_filepath='tmp/*')
     """
     if type(s3_filepath) is str:
         s3_filepath = [s3_filepath]

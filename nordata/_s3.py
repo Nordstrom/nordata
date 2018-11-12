@@ -1,3 +1,4 @@
+# TODO type hinting?
 import os
 import glob
 import boto3
@@ -12,13 +13,17 @@ def create_session(profile_name='default', region_name='us-west-2'):
     Parameters
     ----------
     profile_name : str
-        profile name under which credentials are stores (typically 'default' unless organization specific)
+        profile name under which credentials are stored (default 'default' unless organization specific)
     region_name : str
-        name of AWS regions (typically 'us-west-2')
+        name of AWS regions (default 'us-west-2')
 
     Returns
     -------
     boto3 session object
+
+    Example use
+    -----------
+    TODO
     """
     return boto3.session.Session(profile_name=profile_name, region_name=region_name)
 
@@ -32,15 +37,20 @@ def _s3_get_creds(
     Parameters
     ----------
     profile_name : str
-        profile name under which credentials are stores (typically 'default' unless organization specific)
+        profile name under which credentials are stores (default 'default' unless organization specific)
     region_name : str
-        name of AWS regions (typically 'us-west-2')
+        name of AWS regions (default 'us-west-2')
     session : boto3 session object or None
         you can optionally provide a boto3 session object or the function can instantiate a new one if None
+
     Returns
     -------
     str
         credentials for accessing S3
+
+    Example use
+    -----------
+    TODO
     """
     if session is None:
         session = create_session(profile_name=profile_name, region_name=region_name)
@@ -61,13 +71,17 @@ def s3_get_bucket(
     bucket : str
         name of S3 bucket
     profile_name: str
-        profile name for credentials (typically default or organization-specific)
+        profile name for credentials (default 'default' or organization-specific)
     region_name : str
-        name of AWS regions (typically 'us-west-2')
+        name of AWS regions (default 'us-west-2')
 
     Returns
     -------
     boto3 bucket object
+
+    Example use
+    -----------
+    TODO
     """
     session = create_session(profile_name=profile_name, region_name=region_name)
     s3 = session.resource('s3')
@@ -103,7 +117,7 @@ def s3_download(
     local_filepath : str or list
         path and filename for file(s) to be saved locally
     profile_name : str
-        profile name for credentials (typically 'default' or organization-specific)
+        profile name for credentials (default 'default' or organization-specific)
     region_name : str
         name of AWS region (default value 'us-west-2')
     multipart_threshold : int
@@ -135,18 +149,9 @@ def s3_download(
         s3_filepath='tmp/*.csv',
         filepath='..data/')
     """
-    # TODO give the below some tidying
-    # TODO think about most efficient flow and parsimonious code
-    if isinstance(s3_filepath, list):
-        if len(s3_filepath) != len(local_filepath):
-            raise ValueError('Length of s3_filepath arguments must equal length of local_filepath arguments')
-    elif isinstance(s3_filepath, str):
-        pass
-    else:
-        # raise TypeError('The parameter s3_filepath must be of str or list type')
-        # if s3 and local paths are a single string
-        s3_filepath = [s3_filepath]
-        local_filepath = [local_filepath]
+    _filepath_validator(s3_filepath=s3_filepath, local_filepath=local_filepath)
+    s3_filepath = [s3_filepath]
+    local_filepath = [local_filepath]
     my_bucket = s3_get_bucket(
         bucket=bucket,
         profile_name=profile_name,
@@ -176,7 +181,7 @@ def s3_download(
         except ClientError as e:
             error_code = int(e.response['Error']['Code'])
             if error_code == 400:
-                raise NameError('If running locally, you must run awscreds in the background. ' + str(e))
+                raise NameError('The credentials are expired or not valid. ' + str(e))
             else:
                 raise e
         print('{} download complete'.format(key))
@@ -203,7 +208,7 @@ def s3_upload(
     region_name : str
         name of AWS region (default value 'us-west-2')
     profile_name : str
-        profile name for credentials (typically 'default' or organization-specific)
+        profile name for credentials (default 'default' or organization-specific)
     multipart_threshold : int
         minimum file size to initiate multipart upload
     multipart_chunksize : int
@@ -233,11 +238,7 @@ def s3_upload(
         s3_filepath='tmp/',
         filepath='../data/*.csv')
     """
-    # TODO check that permission is a proper type
-    if type(s3_filepath) == list:
-        if len(s3_filepath) != len(local_filepath):
-            raise ValueError('Length of s3_filepath arguments must equal length of local_filepath arguments')
-
+    _filepath_validator(s3_filepath=s3_filepath, local_filepath=local_filepath)
     my_bucket = s3_get_bucket(
         bucket=bucket,
         profile_name=profile_name,
@@ -278,7 +279,7 @@ def s3_delete(
     s3_filepath : str or list
         path and filename of item(s) within the bucket to be deleted
     profile_name : str
-        profile name for credentials (typically 'default' or organization-specific)
+        profile name for credentials (default 'default' or organization-specific)
     region_name : str
         name of AWS region (default value 'us-west-2')
 
@@ -315,3 +316,18 @@ def s3_delete(
         region_name=region_name)
     response = my_bucket.delete_objects(Delete=del_dict)
     return response['Deleted']
+
+
+def _filepath_validator(s3_filepath, local_filepath):
+    for arg in (s3_filepath, local_filepath):
+        if not isinstance(arg, (list, str)):
+            raise TypeError('Both s3_filepath and local_filepath must be of type str or list')
+    if type(s3_filepath) != type(local_filepath):
+        raise TypeError('Both s3_filepath and local_filepath must be of same type')
+    if isinstance(s3_filepath, list):
+        for f in s3_filepath + local_filepath:
+            if not isinstance(f, str):
+                raise TypeError('If s3_filepath and local_filepath are lists, they must contain strings')
+        if len(s3_filepath) != len(local_filepath):
+            raise ValueError('The s3_filepath list must the same number of elements as the local_filepath list')
+    return

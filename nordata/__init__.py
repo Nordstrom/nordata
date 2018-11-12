@@ -5,7 +5,7 @@ __version__ = '0.1'
 
 # Redshift functions
 from ._redshift import redshift_get_conn
-from ._redshift import redshift_read_sql
+from ._redshift import read_sql
 from ._redshift import redshift_execute_sql
 # S3 functions
 from ._s3 import create_session

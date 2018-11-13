@@ -21,7 +21,7 @@ from nordata import read_sql, redshift_execute_sql, redshift_get_conn
 ```
 Reading a SQL script into Python as a string:
 ```python
-sql = nd.redshift_read_sql(sql_filename='../sql/my_script.sql')
+sql = read_sql(sql_filename='../sql/my_script.sql')
 ```
 Executing a SQL query that does not return data:
 ```python

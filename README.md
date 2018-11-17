@@ -10,8 +10,12 @@ $ pip install nordata
 ```
 
 ## Credentials
-- Redshift: TODO
-- S3: TODO
+### Redshift
+Nordata is designed to ingest your Redshift credentials as an environment variable in the below format. This method allows the user freedom to handle credentials a number of ways. As always, best practices are advised. Your credentials should never be placed in the code of your project such as in a `Dockerfile` or `.env` file. Instead, you may wish to place them in your `.bash_profile` locally or take advantage of a key management service such as the one offered by AWS.
+```bash
+'host=my_hostname dbname=my_dbname user=my_user password=my_password port=1234'
+```
+### S3: TODO
 
 ## How to use Nordata
 ### Redshift functions:

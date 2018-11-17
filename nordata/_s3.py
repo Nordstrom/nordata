@@ -148,34 +148,39 @@ def s3_download(
         s3_filepath='tmp/*.csv',
         filepath='../data/')
     """
+    # validate s3_filepath and local_filepath arguments
     _filepath_validator(s3_filepath=s3_filepath, local_filepath=local_filepath)
-    s3_filepath = [s3_filepath]
-    local_filepath = [local_filepath]
+    # create bucket object
     my_bucket = s3_get_bucket(
         bucket=bucket,
         profile_name=profile_name,
         region_name=region_name)
     # multipart_threshold and multipart_chunksize defaults = Amazon defaults
     config = TransferConfig(multipart_threshold=multipart_threshold, multipart_chunksize=multipart_chunksize)
-    if '*' in s3_filepath:
-        # use left and right for pattern matching
-        left = s3_filepath.split('*')[0]
-        right = s3_filepath.split('*')[-1]
-        # construct s3_path without wildcard
-        s3_path = '/'.join(s3_filepath.split('/')[:-1]) + '/'
-        # get keys, filter out directories, match wildcard, get filenames
-        keys = [item.key for item in my_bucket.objects.filter(Prefix=s3_path)
-                if item.key[-1] != '/' and left in item.key and right in item.key]
-        filenames = [key.split('/')[-1] for key in keys]
-    else:
-        keys = s3_filepath
-        filenames = local_filepath
-
-    for key, local in zip(keys, filenames):
+    # if s3_filepath and local_filepath are not lists, they are str (avoid checking for multiple str types)
+    if not isinstance(s3_filepath, list):
+        # find keys matching wildcard
+        if '*' in s3_filepath:
+            # use left and right for pattern matching
+            left = s3_filepath.split('*')[0]
+            right = s3_filepath.split('*')[-1]
+            # construct s3_path without wildcard
+            s3_path = '/'.join(s3_filepath.split('/')[:-1]) + '/'
+            # get keys, filter out directories, match wildcard, get filenames
+            s3_filepath = [item.key for item in my_bucket.objects.filter(Prefix=s3_path)
+                           if item.key[-1] != '/' and left in item.key and right in item.key]
+            local_files = [os.path.join(local_filepath, key.split('/')[-1]) for key in s3_filepath]
+            local_filepath = local_files
+        # insert into list so same looping structure can be used
+        else:
+            s3_filepath = [s3_filepath]
+            local_filepath = [local_filepath]
+    # download all files from S3
+    for s3_key, local_file in zip(s3_filepath, local_filepath):
         try:
             my_bucket.download_file(
-                key,
-                local,
+                s3_key,
+                local_file,
                 Config=config)
         except ClientError as e:
             error_code = int(e.response['Error']['Code'])
@@ -183,7 +188,7 @@ def s3_download(
                 raise NameError('The credentials are expired or not valid. ' + str(e))
             else:
                 raise e
-        print('{} download complete'.format(key))
+    return
 
 
 def s3_upload(
@@ -237,6 +242,7 @@ def s3_upload(
         s3_filepath='tmp/',
         filepath='../data/*.csv')
     """
+    # TODO bring inline with structure in download function
     _filepath_validator(s3_filepath=s3_filepath, local_filepath=local_filepath)
     my_bucket = s3_get_bucket(
         bucket=bucket,
@@ -303,7 +309,8 @@ def s3_delete(
     # Delete all files in an S3 directory:
     resp = s3_delete(bucket='my_bucket', s3_filepath='tmp/*')
     """
-    if type(s3_filepath) is str:
+    # TODO bring inline with structure in download function
+    if isinstance(s3_filepath, str):
         s3_filepath = [s3_filepath]
     del_dict = {}
     objects = []
@@ -319,6 +326,7 @@ def s3_delete(
 
 
 def _filepath_validator(s3_filepath, local_filepath):
+    # TODO create docstring
     for arg in (s3_filepath, local_filepath):
         if not isinstance(arg, (list, str)):
             raise TypeError('Both s3_filepath and local_filepath must be of type str or list')

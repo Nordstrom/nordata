@@ -1,4 +1,3 @@
-# TODO type hinting?
 import os
 import psycopg2
 

@@ -1,4 +1,3 @@
-# TODO type hinting?
 import os
 import glob
 import boto3
@@ -149,16 +148,16 @@ def s3_download(
         filepath='../data/')
     """
     # validate s3_filepath and local_filepath arguments
-    _filepath_validator(s3_filepath=s3_filepath, local_filepath=local_filepath)
+    _download_upload_filepath_validator(s3_filepath=s3_filepath, local_filepath=local_filepath)
     # create bucket object
     my_bucket = s3_get_bucket(
         bucket=bucket,
         profile_name=profile_name,
         region_name=region_name)
-    # multipart_threshold and multipart_chunksize defaults = Amazon defaults
-    config = TransferConfig(multipart_threshold=multipart_threshold, multipart_chunksize=multipart_chunksize)
-    # if s3_filepath and local_filepath are not lists, they are str (avoid checking for multiple str types)
-    if not isinstance(s3_filepath, list):
+    # multipart_threshold and multipart_chunksize, defaults = Amazon defaults
+    config = TransferConfig(multipart_threshold=multipart_threshold,
+                            multipart_chunksize=multipart_chunksize)
+    if isinstance(s3_filepath, str):
         # find keys matching wildcard
         if '*' in s3_filepath:
             # use left and right for pattern matching
@@ -208,7 +207,7 @@ def s3_upload(
     local_filepath : str or list
         path and filename(s) to be uploaded
     s3_filepath : str or list
-        path and filename within the bucket for the file to be uploaded
+        path and filename(s) within the bucket for the file to be uploaded
     region_name : str
         name of AWS region (default value 'us-west-2')
     profile_name : str
@@ -242,32 +241,34 @@ def s3_upload(
         s3_filepath='tmp/',
         filepath='../data/*.csv')
     """
-    # TODO bring inline with structure in download function
-    _filepath_validator(s3_filepath=s3_filepath, local_filepath=local_filepath)
+    _download_upload_filepath_validator(s3_filepath=s3_filepath, local_filepath=local_filepath)
     my_bucket = s3_get_bucket(
         bucket=bucket,
         profile_name=profile_name,
         region_name=region_name)
-    # multipart_threshold and multipart_chunksize defaults = Amazon defaults
+    # multipart_threshold and multipart_chunksize, defaults = Amazon defaults
     config = TransferConfig(multipart_threshold=multipart_threshold,
                             multipart_chunksize=multipart_chunksize)
-    if '*' in local_filepath:
-        items = glob.glob(local_filepath)
-        # filter out directories
-        filepaths = [item for item in items if os.path.isfile(item)]
-        filenames = [f.split('/')[-1] for f in filepaths]
-    else:
-        filepaths = [local_filepath]
-        filenames = ['']
-    for i, filepath in enumerate(filepaths):
+    if isinstance(local_filepath, str):
+        if '*' in local_filepath:
+            items = glob.glob(local_filepath)
+            # filter out directories
+            local_filepath = [item for item in items if os.path.isfile(item)]
+            tmp_s3_filepath = [s3_filepath + f.split('/')[-1] for f in local_filepath]
+            s3_filepath = tmp_s3_filepath
+        else:
+            local_filepath = [local_filepath]
+            s3_filepath = [s3_filepath]
+    # upload all files to S3
+    for local_file, s3_key in zip(local_filepath, s3_filepath):
         try:
             my_bucket.upload_file(
-                filepath,
-                s3_filepath + filenames[i],
+                local_file,
+                s3_key,
                 Config=config)
         except boto3.exceptions.S3UploadFailedError as e:
             raise S3UploadFailedError(str(e))
-        print('{} upload complete'.format(filepath))
+    return
 
 
 def s3_delete(
@@ -309,7 +310,7 @@ def s3_delete(
     # Delete all files in an S3 directory:
     resp = s3_delete(bucket='my_bucket', s3_filepath='tmp/*')
     """
-    # TODO bring inline with structure in download function
+    _delete_filepath_validator(s3_filepath=s3_filepath)
     if isinstance(s3_filepath, str):
         s3_filepath = [s3_filepath]
     del_dict = {}
@@ -325,17 +326,54 @@ def s3_delete(
     return response['Deleted']
 
 
-def _filepath_validator(s3_filepath, local_filepath):
-    # TODO create docstring
+def _download_upload_filepath_validator(s3_filepath, local_filepath):
+    """ Validates the s3_filepath and local_filepath arguments and raises clear errors
+
+    Parameters
+    ----------
+    s3_filepath : str or list of str
+        path and filename of item(s) within the S3 bucket
+    local_filepath : str or list of str
+        path and filename for local file(s)
+
+    Returns
+    -------
+    None
+    """
     for arg in (s3_filepath, local_filepath):
         if not isinstance(arg, (list, str)):
-            raise TypeError('Both s3_filepath and local_filepath must be of type str or list')
+            raise TypeError('Both s3_filepath and local_filepath must be of type list or str')
     if type(s3_filepath) != type(local_filepath):
         raise TypeError('Both s3_filepath and local_filepath must be of same type')
     if isinstance(s3_filepath, list):
         for f in s3_filepath + local_filepath:
             if not isinstance(f, str):
                 raise TypeError('If s3_filepath and local_filepath are lists, they must contain strings')
+            if '*' in f:
+                raise ValueError('Wildcards (*) are not permitted within a list of filepaths')
         if len(s3_filepath) != len(local_filepath):
             raise ValueError('The s3_filepath list must the same number of elements as the local_filepath list')
+    return
+
+
+def _delete_filepath_validator(s3_filepath):
+    """ Validates the s3_filepath argument and raises clear errors
+
+    Parameters
+    ----------
+    s3_filepath : str or list of str
+        path and filename of item(s) within the S3 bucket
+
+    Returns
+    -------
+    None
+    """
+    if not isinstance(s3_filepath, (list, str)):
+        raise TypeError('s3_filepath must be of type list or str')
+    if isinstance(s3_filepath, list):
+        for f in s3_filepath:
+            if not isinstance(f, str):
+                raise TypeError('If s3_filepath is a list, it must contain strings')
+            if '*' in f:
+                raise ValueError('Wildcards (*) are not permitted within a list of filepaths')
     return

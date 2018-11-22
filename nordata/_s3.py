@@ -159,6 +159,7 @@ def s3_download(
                             multipart_chunksize=multipart_chunksize)
     if isinstance(s3_filepath, str):
         # find keys matching wildcard
+        # TODO make this a function, DRY vs WET
         if '*' in s3_filepath:
             # use left and right for pattern matching
             left = s3_filepath.split('*')[0]
@@ -310,6 +311,7 @@ def s3_delete(
     # Delete all files in an S3 directory:
     resp = s3_delete(bucket='my_bucket', s3_filepath='tmp/*')
     """
+    # TODO add wildcard deletion
     _delete_filepath_validator(s3_filepath=s3_filepath)
     if isinstance(s3_filepath, str):
         s3_filepath = [s3_filepath]
@@ -340,6 +342,7 @@ def _download_upload_filepath_validator(s3_filepath, local_filepath):
     -------
     None
     """
+    # TODO test me
     for arg in (s3_filepath, local_filepath):
         if not isinstance(arg, (list, str)):
             raise TypeError('Both s3_filepath and local_filepath must be of type list or str')
@@ -368,6 +371,7 @@ def _delete_filepath_validator(s3_filepath):
     -------
     None
     """
+    # TODO test me
     if not isinstance(s3_filepath, (list, str)):
         raise TypeError('s3_filepath must be of type list or str')
     if isinstance(s3_filepath, list):

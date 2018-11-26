@@ -159,18 +159,9 @@ def s3_download(
                             multipart_chunksize=multipart_chunksize)
     if isinstance(s3_filepath, str):
         # find keys matching wildcard
-        # TODO make this a function, DRY vs WET
         if '*' in s3_filepath:
-            # use left and right for pattern matching
-            left = s3_filepath.split('*')[0]
-            right = s3_filepath.split('*')[-1]
-            # construct s3_path without wildcard
-            s3_path = '/'.join(s3_filepath.split('/')[:-1]) + '/'
-            # get keys, filter out directories, match wildcard, get filenames
-            s3_filepath = [item.key for item in my_bucket.objects.filter(Prefix=s3_path)
-                           if item.key[-1] != '/' and left in item.key and right in item.key]
-            local_files = [os.path.join(local_filepath, key.split('/')[-1]) for key in s3_filepath]
-            local_filepath = local_files
+            s3_filepath = _s3_glob(s3_filepath=s3_filepath, my_bucket=my_bucket)
+            local_filepath = [os.path.join(local_filepath, key.split('/')[-1]) for key in s3_filepath]
         # insert into list so same looping structure can be used
         else:
             s3_filepath = [s3_filepath]
@@ -311,19 +302,21 @@ def s3_delete(
     # Delete all files in an S3 directory:
     resp = s3_delete(bucket='my_bucket', s3_filepath='tmp/*')
     """
-    # TODO add wildcard deletion
     _delete_filepath_validator(s3_filepath=s3_filepath)
+    my_bucket = s3_get_bucket(
+        bucket=bucket,
+        profile_name=profile_name,
+        region_name=region_name)
     if isinstance(s3_filepath, str):
-        s3_filepath = [s3_filepath]
+        if '*' in s3_filepath:
+            s3_filepath = _s3_glob(s3_filepath=s3_filepath, my_bucket=my_bucket)
+        else:
+            s3_filepath = [s3_filepath]
     del_dict = {}
     objects = []
     for key in s3_filepath:
         objects.append({'Key': key})
     del_dict['Objects'] = objects
-    my_bucket = s3_get_bucket(
-        bucket=bucket,
-        profile_name=profile_name,
-        region_name=region_name)
     response = my_bucket.delete_objects(Delete=del_dict)
     return response['Deleted']
 
@@ -381,3 +374,32 @@ def _delete_filepath_validator(s3_filepath):
             if '*' in f:
                 raise ValueError('Wildcards (*) are not permitted within a list of filepaths')
     return
+
+
+def _s3_glob(s3_filepath, my_bucket):
+    """ Searches a directory in an S3 bucket and returns keys matching the wildcard
+
+    Parameters
+    ----------
+    s3_filepath : str
+        the S3 filepath (with wildcard) to be searched for matches
+    my_bucket : boto3 bucket object
+        the S3 bucket object containing the directories to be searched
+
+    Returns
+    -------
+    list of str
+        S3 filepaths matching the wildcard
+    """
+    # use left and right for pattern matching
+    left, _, right = s3_filepath.partition('*')
+    # construct s3_path without wildcard
+    s3_path = '/'.join(s3_filepath.split('/')[:-1]) + '/'
+    filtered_s3_filepath = []
+    # get keys, filter out directories, match wildcard, get filenames
+    for item in my_bucket.objects.filter(Prefix=s3_path):
+        if item.key[-1] != '/':  # filter out directories
+            p1, p2, p3 = item.key.partition(left)
+            if p1 == '' and p2 == left and right in p3:  # pattern matching
+                filtered_s3_filepath.append(item.key)
+    return filtered_s3_filepath

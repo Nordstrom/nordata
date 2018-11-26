@@ -310,6 +310,8 @@ def s3_delete(
     if isinstance(s3_filepath, str):
         if '*' in s3_filepath:
             s3_filepath = _s3_glob(s3_filepath=s3_filepath, my_bucket=my_bucket)
+            if not s3_filepath:  # check if this list of S3 filepaths is empty
+                return []
         else:
             s3_filepath = [s3_filepath]
     del_dict = {}
@@ -396,10 +398,11 @@ def _s3_glob(s3_filepath, my_bucket):
     # construct s3_path without wildcard
     s3_path = '/'.join(s3_filepath.split('/')[:-1]) + '/'
     filtered_s3_filepath = []
-    # get keys, filter out directories, match wildcard, get filenames
     for item in my_bucket.objects.filter(Prefix=s3_path):
-        if item.key[-1] != '/':  # filter out directories
+        # filter out directories
+        if item.key[-1] != '/':
             p1, p2, p3 = item.key.partition(left)
-            if p1 == '' and p2 == left and right in p3:  # pattern matching
+            # pattern matching
+            if p1 == '' and p2 == left and right in p3:
                 filtered_s3_filepath.append(item.key)
     return filtered_s3_filepath

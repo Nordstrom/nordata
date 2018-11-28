@@ -337,7 +337,6 @@ def _download_upload_filepath_validator(s3_filepath, local_filepath):
     -------
     None
     """
-    # TODO test me
     for arg in (s3_filepath, local_filepath):
         if not isinstance(arg, (list, str)):
             raise TypeError('Both s3_filepath and local_filepath must be of type list or str')
@@ -366,7 +365,6 @@ def _delete_filepath_validator(s3_filepath):
     -------
     None
     """
-    # TODO test me
     if not isinstance(s3_filepath, (list, str)):
         raise TypeError('s3_filepath must be of type list or str')
     if isinstance(s3_filepath, list):

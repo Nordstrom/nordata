@@ -1,4 +1,3 @@
-# TODO type hinting?
 import os
 import psycopg2
 
@@ -115,7 +114,7 @@ def redshift_execute_sql(
                 else:
                     conn.commit()
                     return
-    except psycopg2.ProgrammingError as e:
+    except psycopg2.ProgrammingError as e:  # check "Cannot find reference" warning
         raise RuntimeError('SQL ProgrammingError = {0}'.format(e))
     except Exception as e:
         raise RuntimeError('SQL error = {0}'.format(e))

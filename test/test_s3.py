@@ -4,6 +4,7 @@ from ..nordata import _s3 as s3
 
 
 def test_s3_create_session_type():
+    
     assert isinstance(s3.create_session(), boto3.session.Session)
 
 

@@ -1,10 +1,19 @@
 import os
-import pytest
-import psycopg2
 from ..nordata import _redshift as rs
 
 
 os.environ['TEST_CREDS'] = 'host=my_hostname dbname=my_dbname user=my_user password=my_password port=1234'
+
+
+def test_read_sql_type():
+    # test type returned by read_sql()
+    assert isinstance(rs.read_sql('test/test.sql'), str)
+
+
+def test_read_sql_contents():
+    # test whether contents of str returned by read_sql() are correct
+    test_str = "select\n     col1\n     col2\n from\n     pretend.first_table\n limit\n     1000;"
+    assert rs.read_sql('test/test.sql') == test_str
 
 
 def test_create_creds_dict_type():

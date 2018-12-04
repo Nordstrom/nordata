@@ -1,11 +1,18 @@
 import os
+import pytest
 from ..nordata import _redshift as rs
 
 
 os.environ['TEST_CREDS'] = 'host=my_hostname dbname=my_dbname user=my_user password=my_password port=1234'
 
 
-def test_read_sql_type():
+def test_read_sql_type_error():
+    # test whether read_sql() raises the proper error
+    with pytest.raises(TypeError):
+        rs.read_sql(1)
+
+
+def test_read_sql_return_type():
     # test type returned by read_sql()
     assert isinstance(rs.read_sql('test/test.sql'), str)
 

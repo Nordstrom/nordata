@@ -101,6 +101,7 @@ def redshift_execute_sql(
         return_data=True,
         return_dict=True))
     """
+    _redshift_execute_sql_arg_validator(sql=sql, env_var=env_var, return_data=return_data, return_dict=return_dict)
     try:
         with redshift_get_conn(env_var=env_var) as conn:
             with conn.cursor() as cursor:
@@ -141,3 +142,30 @@ def _create_creds_dict(creds_str):
         split_param = param.split('=')
         creds_dict[split_param[0]] = split_param[1]
     return creds_dict
+
+
+def _redshift_execute_sql_arg_validator(sql, env_var, return_data, return_dict):
+    """ Validates the redshift_execute_sql arguments and raises clear errors
+
+    Parameters
+    ----------
+    sql : str
+        SQL query to be executed
+    env_var : str
+        name of the environment variable containing the credentials str
+    return_data : bool
+        whether or not the query should return data
+    return_dict : bool
+        whether or not to return data as a dict (for easy ingestion into pandas)
+
+    Returns
+    -------
+    None
+    """
+    for arg in [sql, env_var]:
+        if not isinstance(arg, str):
+            raise TypeError('sql and env_var must be of str type')
+    for arg in [return_data, return_dict]:
+        if not isinstance(arg, bool):
+            raise TypeError('return_data and return_dict must be of bool type')
+    return

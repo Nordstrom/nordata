@@ -43,6 +43,8 @@ def read_sql(sql_filename):
     -----------
     sql = read_sql(sql_filename='../sql/my_script.sql')
     """
+    if not isinstance(sql_filename, str):
+        raise TypeError('sql_filename must be of str type')
     with open(sql_filename, 'r') as f:
         sql_str = ' '.join(f.readlines())
     return sql_str

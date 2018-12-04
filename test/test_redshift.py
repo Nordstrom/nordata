@@ -23,6 +23,25 @@ def test_read_sql_contents():
     assert rs.read_sql('test/test.sql') == test_str
 
 
+
+redshift_execute_sql_TypeError_args = [
+    (1, 'foo', True, True),
+    ('foo', 1, True, True),
+    (1, 1, True, True),
+    ('foo', 'bar', True, 'True'),
+    ('foo', 'bar', 'True', True),
+    ('foo', 'bar', True, 1),
+    ('foo', 'bar', 1, True),
+]
+
+
+@pytest.mark.parametrize('sql,env_var,return_data,return_dict', redshift_execute_sql_TypeError_args)
+def test_redshift_execute_sql_type_error(sql, env_var, return_data, return_dict):
+    # test whether redshift_execute_sql() raises the proper error
+    with pytest.raises(TypeError):
+        rs.redshift_execute_sql(sql=sql, env_var=env_var, return_data=return_data, return_dict=return_dict)
+
+
 def test_create_creds_dict_type():
     # test type returned by _create_creds_dict()
     assert isinstance(rs._create_creds_dict(os.environ['TEST_CREDS']), dict)

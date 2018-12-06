@@ -9,12 +9,15 @@ Nordata is a small collection of utility functions for accessing AWS S3 and AWS 
 ## Table of contents:
 
 ### Installing Nordata:
+
 - [Installation instructions](#installing-nordata)
 
 ### Setting up credentials for Nordata:
+
 - [Credentials instructions](#nordata-credentials)
 
 ### How to use Nordata:
+
 - [Nordata instructions](#using-instructions)
 
     Redshift:

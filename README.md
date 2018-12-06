@@ -9,7 +9,7 @@ Nordata is a small collection of utility functions for accessing AWS S3 and AWS 
 ## Table of contents:
 
 ### Installing Nordata:
-- [Installation instructions](#installing-nordata)
+- [Installation instructions](#pip-installing-nordata)
 
 ### Setting up credentials for Nordata:
 - [Credentials instructions](#nordata-credentials)
@@ -44,7 +44,8 @@ Nordata is a small collection of utility functions for accessing AWS S3 and AWS 
     - [Creating a boto3 session object (experienced users)](#boto-session)
     - [Creating a bucket object (experienced users)](#get-bucket)
 
-<a name="installing-nordata"></a>
+
+<a name="pip-installing-nordata"></a>
 ## Installing Nordata:
 Nordata can be install via pip. As always, use of a project-level virtual environment is recommended.
 

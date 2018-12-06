@@ -6,6 +6,46 @@ Nick Buker
 ## Introduction:
 Nordata is a small collection of utility functions for accessing AWS S3 and AWS Redshift. The goal of this project is to create a simple, robust package to ease data work-flow and allow the same tool to be used for development and production. Nordata is not intended to handle every possible need (for example credential management is largely left to the user) but it is designed to streamline common tasks.
 
+## Table of contents:
+
+### Installing Nordata:
+- [Installation instructions](#installing-nordata)
+
+### Setting up credentials for Nordata:
+- [Credentials instructions](#nordata-credentials)
+
+### How to use Nordata:
+- [Nordata instructions](#using-instructions)
+
+    Redshift:
+
+    - [Importing nordata Redshift functions](#redshift-import)
+    - [Reading a SQL script into Python as a string](#read-sql)
+    - [Executing a SQL query that does not return data](#redshift-execute-sql-no-return)
+    - [Executing a SQL query that returns data](#redshift-execute-sql-return)
+    - [Executing a SQL query that returns data for pandas](#redshift-execute-sql-return-dict)
+    - [Creating a connection object (experienced users)](#redshift-get-conn)
+
+    S3:
+
+    - [Importing S3 functions](#s3-import)
+    - [Downloading a single file from S3](#s3-download-single)
+    - [Downloading a list of files from S3](#s3-download-list)
+    - [Downloading files matching a pattern from S3](#s3-download-pattern)
+    - [Downloading all files in a directory from S3](#s3-download-all)
+    - [Uploading a single file to S3](#s3-upload-single)
+    - [Uploading a list of files to S3](#s3-upload-list)
+    - [Uploading files matching a pattern to S3](#s3-upload-pattern)
+    - [Uploading all files in a directory to S3](#s3-upload-all)
+    - [Deleting a single file in S3](#s3-delete-single)
+    - [Deleting a list of files in S3](#s3-delete-list)
+    - [Deleting files matching a pattern in S3](#s3-delete-pattern)
+    - [Deleting all files in a directory in S3](#s3-delete-all)
+    - [Creating a boto3 session object (experienced users)](#boto-session)
+    - [Creating a bucket object (experienced users)](#get-bucket)
+
+<a name="installing-nordata"></a>
+
 ## Installing Nordata:
 Nordata can be install via pip. As always, use of a project-level virtual environment is recommended.
 
@@ -15,7 +55,10 @@ Nordata can be install via pip. As always, use of a project-level virtual enviro
 $ pip install nordata
 ```
 
+<a name="nordata-credentials"></a>
+
 ## Setting up credentials for Nordata:
+
 ### Redshift:
 Nordata is designed to ingest your Redshift credentials as an environment variable in the below format. This method allows the user freedom to handle credentials a number of ways. As always, best practices are advised. Your credentials should never be placed in the code of your project such as in a `Dockerfile` or `.env` file. Instead, you may wish to place them in your `.bash_profile` locally or take advantage of a key management service such as the one offered by AWS.
 
@@ -35,58 +78,31 @@ aws_security_token="another_string_of_random_characters=="
 region=us-west-2
 ```
 
+<a name="using-nordata"></a>
+
 ## How to use Nordata:
-
-### Table of contents:
-
-#### Redshift:
-
-- [Importing nordata Redshift functions](#redshift-import)
-- [Reading a SQL script into Python as a string](#read-sql)
-- [Executing a SQL query that does not return data](#redshift-execute-sql-no-return)
-- [Executing a SQL query that returns data](#redshift-execute-sql-return)
-- [Executing a SQL query that returns data for pandas](#redshift-execute-sql-return-dict)
-- [Creating a connection object (experienced users)](#redshift-get-conn)
-
-#### S3:
-
-- [Importing S3 functions](#s3-import)
-- [Downloading a single file from S3](#s3-download-single)
-- [Downloading a list of files from S3](#s3-download-list)
-- [Downloading files matching a pattern from S3](#s3-download-pattern)
-- [Downloading all files in a directory from S3](#s3-download-all)
-- [Uploading a single file to S3](#s3-upload-single)
-- [Uploading a list of files to S3](#s3-upload-list)
-- [Uploading files matching a pattern to S3](#s3-upload-pattern)
-- [Uploading all files in a directory to S3](#s3-upload-all)
-- [Deleting a single file in S3](#s3-delete-single)
-- [Deleting a list of files in S3](#s3-delete-list)
-- [Deleting files matching a pattern in S3](#s3-delete-pattern)
-- [Deleting all files in a directory in S3](#s3-delete-all)
-- [Creating a boto3 session object (experienced users)](#boto-session)
-- [Creating a bucket object (experienced users)](#get-bucket)
 
 ### Redshift:
 
-<a name="redshift-import">
+<a name="redshift-import"></a>
 Importing nordata Redshift functions:
-</a>
+
 
 ```python
 from nordata import read_sql, redshift_execute_sql, redshift_get_conn
 ```
 
-<a name="read-sql">
+<a name="read-sql"></a>
 Reading a SQL script into Python as a string:
-</a>
+
 
 ```python
 sql = read_sql(sql_filename='../sql/my_script.sql')
 ```
 
-<a name="redshift-execute-sql-no-return">
+<a name="redshift-execute-sql-no-return"></a>
 Executing a SQL query that does not return data:
-</a>
+
 
 ```python
 redshift_execute_sql(
@@ -96,9 +112,9 @@ redshift_execute_sql(
     return_dict=False)
 ```
 
-<a name="redshift-execute-sql-return">
+<a name="redshift-execute-sql-return"></a>
 Executing a SQL query that returns data as a list of tuples and column names as a list of strings:
-</a>
+
 
 ```python
 data, columns = redshift_execute_sql(
@@ -108,8 +124,8 @@ data, columns = redshift_execute_sql(
     return_dict=False)
 ```
 
-<a name="redshift-execute-sql-return-dict">Executing a SQL query that returns data as a dict for easy ingestion into a pandas DataFrame:
-</a>
+<a name="redshift-execute-sql-return-dict"></a>Executing a SQL query that returns data as a dict for easy ingestion into a pandas DataFrame:
+
 
 ```python
 import pandas as pd
@@ -121,26 +137,23 @@ df = pd.DataFrame(**redshift_execute_sql(
     return_dict=True))
 ```
 
-<a name="redshift-get-conn">
+<a name="redshift-get-conn"></a>
 Creating a connection object that can be manipulated directly by experienced users:
-</a>
 
 ```python
 conn = redshift_get_conn(env_var='REDSHIFT_CREDS')
 ```
 
 ### S3:
-<a name="s3-import">
+<a name="s3-import"></a>
 Importing S3 functions:
-</a>
 
 ```python
 from nordata import s3_download, s3_upload, s3_delete, create_session, s3_get_bucket
 ```
 
-<a name="s3-download-single">
+<a name="s3-download-single"></a>
 Downloading a single file from S3:
-</a>
 
 ```python
 s3_download(
@@ -149,9 +162,8 @@ s3_download(
     filepath='../data/my_file.csv')
 ```
 
-<a name="s3-download-list">
+<a name="s3-download-list"></a>
 Downloading a list of files from S3 (will not upload contents of subdirectories):
-</a>
 
 ```python
 s3_download(
@@ -160,9 +172,8 @@ s3_download(
     filepath=['../data/my_file1.csv', '../data/my_file2.csv', '../img.png'])
 ```
 
-<a name="s3-download-pattern">
+<a name="s3-download-pattern"></a>
 Downloading files matching a pattern from S3 (will not upload contents of subdirectories):
-</a>
 
 ```python
 s3_upload(
@@ -171,9 +182,8 @@ s3_upload(
     filepath='../data/*.csv')
 ```
 
-<a name="s3-download-all">
+<a name="s3-download-all"></a>
 Downloading all files in a directory from S3 (will not upload contents of subdirectories):
-</a>
 
 ```python
 s3_upload(
@@ -182,9 +192,8 @@ s3_upload(
     filepath='../data/*')
 ```
 
-<a name="s3-upload-single">
+<a name="s3-upload-single"></a>
 Uploading a single file to S3:
-</a>
 
 ```python
 s3_upload(
@@ -193,9 +202,8 @@ s3_upload(
     s3_filepath='tmp/my_file.csv')
 ```
 
-<a name="s3-upload-list">
+<a name="s3-upload-list"></a>
 Uploading a list of files to S3 (will not upload contents of subdirectories):
-</a>
 
 ```python
 s3_upload(
@@ -204,9 +212,8 @@ s3_upload(
     s3_filepath=['tmp/my_file1.csv', 'tmp/my_file2.csv', 'img.png'])
 ```
 
-<a name="s3-upload-pattern">
+<a name="s3-upload-pattern"></a>
 Uploading files matching a pattern to S3 (will not upload contents of subdirectories):
-</a>
 
 ```python
 s3_upload(
@@ -215,9 +222,8 @@ s3_upload(
     s3_filepath='tmp/')
 ```
 
-<a name="s3-upload-all">
+<a name="s3-upload-all"></a>
 Uploading all files in a directory to S3 (will not upload contents of subdirectories):
-</a>
 
 ```python
 s3_upload(
@@ -226,17 +232,15 @@ s3_upload(
     s3_filepath='tmp/')
 ```
 
-<a name="s3-delete-single">
+<a name="s3-delete-single"></a>
 Deleting a single file in S3:
-</a>
 
 ```python
 resp = s3_delete(bucket='my_bucket', s3_filepath='tmp/my_file.csv')
 ```
 
-<a name="s3-delete-list">
+<a name="s3-delete-list"></a>
 Deleting a list of files in S3:
-</a>
 
 ```python
 resp = s3_delete(
@@ -244,33 +248,29 @@ resp = s3_delete(
     s3_filepath=['tmp/my_file1.csv', 'tmp/my_file2.csv', 'img.png'])
 ```
 
-<a name="s3-delete-pattern">
+<a name="s3-delete-pattern"></a>
 Deleting files matching a pattern in S3:
-</a>
 
 ```python
 resp = s3_delete(bucket='my_bucket', s3_filepath='tmp/*.csv')
 ```
 
-<a name="s3-delete-all">
+<a name="s3-delete-all"></a>
 Deleting all files in a directory in S3:
-</a>
 
 ```python
 resp = s3_delete(bucket='my_bucket', s3_filepath='tmp/*')
 ```
 
-<a name="boto-session">
+<a name="boto-session"></a>
 Creating a boto3 session object that can be manipulated directly by experienced users:
-</a>
 
 ```python
 session = create_session(profile_name='default', region_name='us-west-2')
 ```
 
-<a name="get-bucket">
+<a name="get-bucket"></a>
 Creating a bucket object that can be manipulated directly by experienced users:
-</a>
 
 ```python
 bucket = s3_get_bucket(

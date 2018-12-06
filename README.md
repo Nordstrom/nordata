@@ -45,7 +45,6 @@ Nordata is a small collection of utility functions for accessing AWS S3 and AWS 
     - [Creating a bucket object (experienced users)](#get-bucket)
 
 <a name="installing-nordata"></a>
-
 ## Installing Nordata:
 Nordata can be install via pip. As always, use of a project-level virtual environment is recommended.
 
@@ -56,7 +55,6 @@ $ pip install nordata
 ```
 
 <a name="nordata-credentials"></a>
-
 ## Setting up credentials for Nordata:
 
 ### Redshift:
@@ -79,7 +77,6 @@ region=us-west-2
 ```
 
 <a name="using-nordata"></a>
-
 ## How to use Nordata:
 
 ### Redshift:

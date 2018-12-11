@@ -4,7 +4,7 @@
 Nick Buker
 
 ## Introduction:
-Nordata is a small collection of utility functions for accessing AWS S3 and AWS Redshift. The goal of this project is to create a simple, robust package to ease data work-flow and allow the same tool to be used for development and production. Nordata is not intended to handle every possible need (for example credential management is largely left to the user) but it is designed to streamline common tasks.
+Nordata is a small collection of utility functions for accessing AWS S3 and AWS Redshift. It was written by a data scientist on the Nordstrom Analytics Team. The goal Nordata is to be a simple, robust package to ease data work-flow. It is not intended to handle every possible need (for example credential management is largely left to the user) but it is designed to streamline common tasks.
 
 ## Table of contents:
 

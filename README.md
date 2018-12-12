@@ -44,6 +44,9 @@ Nordata is a small collection of utility functions for accessing AWS S3 and AWS 
     - [Creating a boto3 session object (experienced users)](#boto-session)
     - [Creating a bucket object (experienced users)](#get-bucket)
 
+### Testing:
+- [Testing Nordata](#testing)
+
 
 <a name="pip-installing-nordata"></a>
 ## Installing Nordata:
@@ -275,4 +278,12 @@ bucket = s3_get_bucket(
     bucket='my_bucket',
     profile_name='default',
     region_name='us-west-2')
+```
+
+<a name="testing"></a>
+## Testing:
+For those interested in contributing to Nordata or forking and editing the project, pytest is the testing framework used. To run the tests, create a virtual environment, install the `dev-requirements.txt`, and run the following command from the root directory of the project. The testing scripts can be found in the test/ directory.
+
+```bash
+$ pytest
 ```

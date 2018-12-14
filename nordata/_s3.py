@@ -129,23 +129,36 @@ def s3_download(
 
     Example use
     -----------
-    # Download a single file:
+    # Downloading a single file from S3:
     s3_download(
         bucket='my_bucket',
         s3_filepath='tmp/my_file.csv',
-        filepath='../data/my_file.csv')
+        local_filepath='../data/my_file.csv')
 
-    # Download all files in a directory (will not upload contents of subdirectories):
+    # Downloading with a profile name:
     s3_download(
         bucket='my_bucket',
-        s3_filepath='tmp/*',
-        filepath='../data/')
+        profile_name='my-profile-name',
+        s3_filepath='tmp/my_file.csv',
+        local_filepath='../data/my_file.csv')
 
-    # Download all files in a directory matching a wildcard (will not download contents of subdirectories):
+    # Downloading a list of files from S3 (will not upload contents of subdirectories):
     s3_download(
         bucket='my_bucket',
-        s3_filepath='tmp/*.csv',
-        filepath='../data/')
+        s3_filepath=['tmp/my_file1.csv', 'tmp/my_file2.csv', 'img.png'],
+        local_filepath=['../data/my_file1.csv', '../data/my_file2.csv', '../img.png'])
+
+    # Downloading files matching a pattern from S3 (will not upload contents of subdirectories):
+    s3_upload(
+        bucket='my_bucket',
+        s3_filepath='tmp/',
+        local_filepath='../data/*.csv')
+
+    # Downloading all files in a directory from S3 (will not upload contents of subdirectories):
+    s3_upload(
+        bucket='my_bucket',
+        s3_filepath='tmp/',
+        local_filepath='../data/*')
     """
     # validate s3_filepath and local_filepath arguments
     _download_upload_filepath_validator(s3_filepath=s3_filepath, local_filepath=local_filepath)
@@ -215,23 +228,37 @@ def s3_upload(
 
     Example use
     -----------
-    # to upload a single file
-    s3_upload(
-        bucket='my_bucket',
-        s3_filepath='tmp/my_file.csv',
-        filepath='../data/my_file.csv')
 
-    # to upload all files in a directory (will not upload contents of subdirectories)
+    # Uploading a single file to S3:
     s3_upload(
         bucket='my_bucket',
-        s3_filepath='tmp/',
-        filepath='../data/*')
+        local_filepath='../data/my_file.csv',
+        s3_filepath='tmp/my_file.csv')
 
-    # to upload all files in a directory matching a wildcard (will not upload contents of subdirectories)
+    # Uploading with a profile name:
     s3_upload(
         bucket='my_bucket',
-        s3_filepath='tmp/',
-        filepath='../data/*.csv')
+        profile_name='my-profile-name',
+        local_filepath='../data/my_file.csv',
+        s3_filepath='tmp/my_file.csv')
+
+    Uploading a list of files to S3 (will not upload contents of subdirectories):
+    s3_upload(
+        bucket='my_bucket',
+        local_filepath=['../data/my_file1.csv', '../data/my_file2.csv', '../img.png'],
+        s3_filepath=['tmp/my_file1.csv', 'tmp/my_file2.csv', 'img.png'])
+
+    Uploading files matching a pattern to S3 (will not upload contents of subdirectories):
+    s3_upload(
+        bucket='my_bucket',
+        local_filepath='../data/*.csv',
+        s3_filepath='tmp/')
+
+    Uploading all files in a directory to S3 (will not upload contents of subdirectories):
+    s3_upload(
+        bucket='my_bucket',
+        local_filepath='../data/*'
+        s3_filepath='tmp/')
     """
     _download_upload_filepath_validator(s3_filepath=s3_filepath, local_filepath=local_filepath)
     my_bucket = s3_get_bucket(
@@ -288,18 +315,24 @@ def s3_delete(
 
     Example use
     -----------
-    # Delete a single item:
-    resp = s3_delete(bucket='my_bucket', s3_filepath='file1.txt')
+    # Deleting a single file in S3:
+    resp = s3_delete(bucket='my_bucket', s3_filepath='tmp/my_file.csv')
 
-    # Delete multiple items:
+    # Deleting with a profile name:
+    s3_upload(
+        bucket='my_bucket',
+        profile_name='my-profile-name',
+        s3_filepath='tmp/my_file.csv')
+
+    # Deleting a list of files in S3:
     resp = s3_delete(
         bucket='my_bucket',
         s3_filepath=['tmp/my_file1.csv', 'tmp/my_file2.csv', 'img.png'])
 
-    # Delete all files matching a pattern:
+    # Deleting files matching a pattern in S3:
     resp = s3_delete(bucket='my_bucket', s3_filepath='tmp/*.csv')
 
-    # Delete all files in an S3 directory:
+    # Deleting all files in a directory in S3:
     resp = s3_delete(bucket='my_bucket', s3_filepath='tmp/*')
     """
     _delete_filepath_validator(s3_filepath=s3_filepath)

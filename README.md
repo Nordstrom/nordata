@@ -30,14 +30,17 @@ Nordata is a small collection of utility functions for accessing AWS S3 and AWS 
 
     - [Importing S3 functions](#s3-import)
     - [Downloading a single file from S3](#s3-download-single)
+    - [Downloading with a profile name](#s3-download-profile-name)
     - [Downloading a list of files from S3](#s3-download-list)
     - [Downloading files matching a pattern from S3](#s3-download-pattern)
     - [Downloading all files in a directory from S3](#s3-download-all)
     - [Uploading a single file to S3](#s3-upload-single)
+    - [Uploading with a profile name](#s3-upload-profile-name)
     - [Uploading a list of files to S3](#s3-upload-list)
     - [Uploading files matching a pattern to S3](#s3-upload-pattern)
     - [Uploading all files in a directory to S3](#s3-upload-all)
     - [Deleting a single file in S3](#s3-delete-single)
+    - [Deleting with a profile name](#s3-delete-profile-name)
     - [Deleting a list of files in S3](#s3-delete-list)
     - [Deleting files matching a pattern in S3](#s3-delete-pattern)
     - [Deleting all files in a directory in S3](#s3-delete-all)
@@ -79,6 +82,8 @@ aws_session_token="long_string_of_random_characters=="
 aws_security_token="another_string_of_random_characters=="
 region=us-west-2
 ```
+
+Note the the profile name in brackets. If the profile name differs in your credentials file, you will likely need to pass this profile name to the S3 functions as an argument.
 
 <a name="using-nordata"></a>
 ## How to use Nordata:
@@ -160,7 +165,18 @@ Downloading a single file from S3:
 s3_download(
     bucket='my_bucket',
     s3_filepath='tmp/my_file.csv',
-    filepath='../data/my_file.csv')
+    local_filepath='../data/my_file.csv')
+```
+
+<a name="s3-download-profile-name"></a>
+Downloading with a profile name:
+
+```python
+s3_download(
+    bucket='my_bucket',
+    profile_name='my-profile-name',
+    s3_filepath='tmp/my_file.csv',
+    local_filepath='../data/my_file.csv')
 ```
 
 <a name="s3-download-list"></a>
@@ -170,7 +186,7 @@ Downloading a list of files from S3 (will not upload contents of subdirectories)
 s3_download(
     bucket='my_bucket',
     s3_filepath=['tmp/my_file1.csv', 'tmp/my_file2.csv', 'img.png'],
-    filepath=['../data/my_file1.csv', '../data/my_file2.csv', '../img.png'])
+    local_filepath=['../data/my_file1.csv', '../data/my_file2.csv', '../img.png'])
 ```
 
 <a name="s3-download-pattern"></a>
@@ -180,7 +196,7 @@ Downloading files matching a pattern from S3 (will not upload contents of subdir
 s3_upload(
     bucket='my_bucket',
     s3_filepath='tmp/',
-    filepath='../data/*.csv')
+    local_filepath='../data/*.csv')
 ```
 
 <a name="s3-download-all"></a>
@@ -190,7 +206,7 @@ Downloading all files in a directory from S3 (will not upload contents of subdir
 s3_upload(
     bucket='my_bucket',
     s3_filepath='tmp/',
-    filepath='../data/*')
+    local_filepath='../data/*')
 ```
 
 <a name="s3-upload-single"></a>
@@ -199,7 +215,18 @@ Uploading a single file to S3:
 ```python
 s3_upload(
     bucket='my_bucket',
-    filepath='../data/my_file.csv',
+    local_filepath='../data/my_file.csv',
+    s3_filepath='tmp/my_file.csv')
+```
+
+<a name="s3-upload-profile-name"></a>
+Uploading with a profile name:
+
+```python
+s3_upload(
+    bucket='my_bucket',
+    profile_name='my-profile-name',
+    local_filepath='../data/my_file.csv',
     s3_filepath='tmp/my_file.csv')
 ```
 
@@ -209,7 +236,7 @@ Uploading a list of files to S3 (will not upload contents of subdirectories):
 ```python
 s3_upload(
     bucket='my_bucket',
-    filepath=['../data/my_file1.csv', '../data/my_file2.csv', '../img.png'],
+    local_filepath=['../data/my_file1.csv', '../data/my_file2.csv', '../img.png'],
     s3_filepath=['tmp/my_file1.csv', 'tmp/my_file2.csv', 'img.png'])
 ```
 
@@ -219,7 +246,7 @@ Uploading files matching a pattern to S3 (will not upload contents of subdirecto
 ```python
 s3_upload(
     bucket='my_bucket',
-    filepath='../data/*.csv',
+    local_filepath='../data/*.csv',
     s3_filepath='tmp/')
 ```
 
@@ -229,7 +256,7 @@ Uploading all files in a directory to S3 (will not upload contents of subdirecto
 ```python
 s3_upload(
     bucket='my_bucket',
-    filepath='../data/*'
+    local_filepath='../data/*'
     s3_filepath='tmp/')
 ```
 
@@ -238,6 +265,16 @@ Deleting a single file in S3:
 
 ```python
 resp = s3_delete(bucket='my_bucket', s3_filepath='tmp/my_file.csv')
+```
+
+<a name="s3-delete-profile-name"></a>
+Deleting with a profile name:
+
+```python
+s3_upload(
+    bucket='my_bucket',
+    profile_name='my-profile-name',
+    s3_filepath='tmp/my_file.csv')
 ```
 
 <a name="s3-delete-list"></a>

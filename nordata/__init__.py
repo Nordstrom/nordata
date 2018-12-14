@@ -1,6 +1,6 @@
 '''Convenience wrappers for connecting to AWS S3 and Redshift'''
 
-__version__ = '0.1'
+__version__ = '0.1.1'
 
 
 # Redshift functions

@@ -6,6 +6,12 @@ from ..nordata import _redshift as rs
 os.environ['TEST_CREDS'] = 'host=my_hostname dbname=my_dbname user=my_user password=my_password port=1234'
 
 
+def test_redshift_get_conn_value_error():
+    # test whether redshift_get_conn() raises a ValueError when passed a connection str
+    with pytest.raises(ValueError):
+        rs.redshift_get_conn(os.environ['TEST_CREDS'])
+
+
 def test_read_sql_type_error():
     # test whether read_sql() raises the proper error
     with pytest.raises(TypeError):
@@ -21,7 +27,6 @@ def test_read_sql_contents():
     # test whether contents of str returned by read_sql() are correct
     test_str = "select\n     col1\n     col2\n from\n     pretend.first_table\n limit\n     1000;"
     assert rs.read_sql('test/test.sql') == test_str
-
 
 
 redshift_execute_sql_TypeError_args = [

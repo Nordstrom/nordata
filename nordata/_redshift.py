@@ -20,6 +20,7 @@ def redshift_get_conn(env_var):
     -----------
     conn = redshift_get_conn(env_var='REDSHIFT_CREDS')
     """
+    _env_var_validator(env_var=env_var)
     cred_str = os.environ[env_var]
     creds_dict = _create_creds_dict(cred_str)
     conn = psycopg2.connect(**creds_dict)
@@ -142,6 +143,24 @@ def _create_creds_dict(creds_str):
         split_param = param.split('=')
         creds_dict[split_param[0]] = split_param[1]
     return creds_dict
+
+
+def _env_var_validator(env_var):
+    """ Validates that the user is providing the an environment variable name, rather than the credentials string
+
+    Parameters
+    ----------
+    env_var : str
+        the name of the environment variable referencing the Redshift credential string
+
+    Returns
+    -------
+    None
+    """
+    creds_str_keys = ['host', 'dbname', 'user', 'password', 'port']
+    if all(key in env_var for key in creds_str_keys):
+        raise ValueError('This field should contain the name of an env variable, not the credentials string')
+    return
 
 
 def _redshift_execute_sql_arg_validator(sql, env_var, return_data, return_dict):

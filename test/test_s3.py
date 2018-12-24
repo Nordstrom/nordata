@@ -1,11 +1,5 @@
 import pytest
-import boto3
 from ..nordata import _s3 as s3
-
-
-def test_create_session_type():
-    # test whether _create_session() returns the proper type
-    assert isinstance(s3.create_session(), boto3.session.Session)
 
 
 download_upload_TypeError_args = [

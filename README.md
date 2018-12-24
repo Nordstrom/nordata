@@ -44,12 +44,16 @@ Nordata is a small collection of utility functions for accessing AWS S3 and AWS 
     - [Deleting a list of files in S3](#s3-delete-list)
     - [Deleting files matching a pattern in S3](#s3-delete-pattern)
     - [Deleting all files in a directory in S3](#s3-delete-all)
-    - [Creating a boto3 session object (experienced users)](#boto-session)
     - [Creating a bucket object (experienced users)](#get-bucket)
 
-### Testing:
-- [Testing Nordata](#nordata-testing)
+    Boto3:
+    - [Importing boto3 functions](#boto-import)
+    - [Getting boto3 credentials](#boto-creds)
+    - [Creating a boto3 session object (experienced users)](#boto-session)
 
+### Testing:
+
+- [Testing Nordata](#nordata-testing)
 
 <a name="pip-installing-nordata"></a>
 ## Installing Nordata:
@@ -300,13 +304,6 @@ Deleting all files in a directory in S3:
 resp = s3_delete(bucket='my_bucket', s3_filepath='tmp/*')
 ```
 
-<a name="boto-session"></a>
-Creating a boto3 session object that can be manipulated directly by experienced users:
-
-```python
-session = create_session(profile_name='default', region_name='us-west-2')
-```
-
 <a name="get-bucket"></a>
 Creating a bucket object that can be manipulated directly by experienced users:
 
@@ -316,6 +313,32 @@ bucket = s3_get_bucket(
     profile_name='default',
     region_name='us-west-2')
 ```
+
+### Boto3:
+<a name="boto-import"></a>
+Importing boto3 functions:
+
+```python
+from nordata import boto_get_creds, boto_create_session
+```
+
+<a name="boto-creds"></a>
+Retrieves Boto3 credentials as a string for use in `COPY` and `UNLOAD` SQL statetments:
+
+```python
+creds = boto_get_creds(
+    profile_name='default',
+    region_name='us-west-2',
+    session=None)
+```
+
+<a name="boto-session"></a>
+Creating a boto3 session object that can be manipulated directly by experienced users:
+
+```python
+session = boto_create_session(profile_name='default', region_name='us-west-2')
+```
+
 
 <a name="nordata-testing"></a>
 ## Testing:

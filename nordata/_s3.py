@@ -1,6 +1,3 @@
-# TODO: update docstrings and README
-# TODO: write boto creds test
-# TODO: add changes to CHANGELOG.md
 import os
 import glob
 import boto3

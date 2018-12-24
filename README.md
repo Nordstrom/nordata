@@ -46,10 +46,10 @@ Nordata is a small collection of utility functions for accessing AWS S3 and AWS 
     - [Deleting all files in a directory in S3](#s3-delete-all)
     - [Creating a bucket object (experienced users)](#get-bucket)
 
-    Boto3:
+    Boto3 (experienced users):
     - [Importing boto3 functions](#boto-import)
     - [Getting boto3 credentials](#boto-creds)
-    - [Creating a boto3 session object (experienced users)](#boto-session)
+    - [Creating a boto3 session object](#boto-session)
 
 ### Testing:
 

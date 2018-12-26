@@ -47,9 +47,15 @@ Nordata is a small collection of utility functions for accessing AWS S3 and AWS 
     - [Creating a bucket object (experienced users)](#get-bucket)
 
     Boto3 (experienced users):
+
     - [Importing boto3 functions](#boto-import)
     - [Getting boto3 credentials](#boto-creds)
     - [Creating a boto3 session object](#boto-session)
+
+    Transferring data between Redshift and S3:
+
+    - [Transferring data from Redshift to S3](#redshift-unload)
+    - [Transferring data from S3 to Redshift](#redshift-copy)
 
 ### Testing:
 
@@ -339,10 +345,76 @@ Creating a boto3 session object that can be manipulated directly by experienced 
 session = boto_create_session(profile_name='default', region_name='us-west-2')
 ```
 
+### Transferring data between Redshift and S3:
+
+<a name="redshift-unload"></a>
+Transferring data from Redshift to S3 using an `UNLOAD` statement (see [Redshift UNLOAD documentation](https://docs.aws.amazon.com/redshift/latest/dg/r_UNLOAD.html) for more information):
+```python
+
+from nordata import boto_get_creds, redshift_execute_sql
+
+
+creds = boto_get_creds(
+    profile_name='default',
+    region_name='us-west-2',
+    session=None)
+
+sql = f'''
+
+    unload (
+        'select
+            col1
+            ,col2
+        from
+            my_schema.my_table'
+    )
+    to
+        's3://mybucket/unload/my_table/'
+    credentials
+        '{creds}'
+    parallel off header gzip allowoverwrite;
+'''
+
+redshift_execute_sql(
+    sql=sql,
+    env_var='REDSHIFT_CREDS',
+    return_data=False,
+    return_dict=False)
+```
+
+<a name="redshift-copy"></a>
+Transferring data from S3 to Redshift using a `COPY` statement (see [Redshift COPY documentation](https://docs.aws.amazon.com/redshift/latest/dg/r_COPY.html) for more information):
+```python
+
+from nordata import boto_get_creds, redshift_execute_sql
+
+
+creds = boto_get_creds(
+    profile_name='default',
+    region_name='us-west-2',
+    session=None)
+
+sql = f'''
+
+    copy
+        my_schema.my_table
+    from
+        's3://mybucket/unload/my_table/'
+    credentials
+        '{creds}'
+    ignoreheader 1 gzip;
+'''
+
+redshift_execute_sql(
+    sql=sql,
+    env_var='REDSHIFT_CREDS',
+    return_data=False,
+    return_dict=False)
+```
 
 <a name="nordata-testing"></a>
 ## Testing:
-For those interested in contributing to Nordata or forking and editing the project, pytest is the testing framework used. To run the tests, create a virtual environment, install the `dev-requirements.txt`, and run the following command from the root directory of the project. The testing scripts can be found in the test/ directory.
+For those interested in contributing to Nordata or forking and editing the project, pytest is the testing framework used. To run the tests, create a virtual environment, install the contents of `dev-requirements.txt`, and run the following command from the root directory of the project. The testing scripts can be found in the `test/` directory.
 
 ```bash
 $ pytest

@@ -101,16 +101,16 @@ def s3_download(
         local_filepath=['../data/my_file1.csv', '../data/my_file2.csv', '../img.png'])
 
     # Downloading files matching a pattern from S3 (will not upload contents of subdirectories):
-    s3_upload(
+    s3_download(
         bucket='my_bucket',
-        s3_filepath='tmp/',
-        local_filepath='../data/*.csv')
+        s3_filepath='tmp/*.csv',
+        local_filepath='../data/')
 
     # Downloading all files in a directory from S3 (will not upload contents of subdirectories):
-    s3_upload(
+    s3_download(
         bucket='my_bucket',
-        s3_filepath='tmp/',
-        local_filepath='../data/*')
+        s3_filepath='tmp/*',
+        local_filepath='../data/')
     """
     # validate s3_filepath and local_filepath arguments
     _download_upload_filepath_validator(s3_filepath=s3_filepath, local_filepath=local_filepath)

@@ -51,7 +51,7 @@ def boto_get_creds(
     """
     if session is None:
         session = boto_create_session(profile_name=profile_name, region_name=region_name)
-    access_key = session.get_credentials().access_key,
-    secret_key = session.get_credentials().secret_key,
-    token = session.get_credentials().token,
+    access_key = session.get_credentials().access_key
+    secret_key = session.get_credentials().secret_key
+    token = session.get_credentials().token
     return f'''aws_access_key_id={access_key};aws_secret_access_key={secret_key};token={token}'''

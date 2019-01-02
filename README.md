@@ -203,20 +203,20 @@ s3_download(
 Downloading files matching a pattern from S3 (will not upload contents of subdirectories):
 
 ```python
-s3_upload(
+s3_download(
     bucket='my_bucket',
-    s3_filepath='tmp/',
-    local_filepath='../data/*.csv')
+    s3_filepath='tmp/*.csv',
+    local_filepath='../data/')
 ```
 
 <a name="s3-download-all"></a>
 Downloading all files in a directory from S3 (will not upload contents of subdirectories):
 
 ```python
-s3_upload(
+s3_download(
     bucket='my_bucket',
-    s3_filepath='tmp/',
-    local_filepath='../data/*')
+    s3_filepath='tmp/*',
+    local_filepath='../data/')
 ```
 
 <a name="s3-upload-single"></a>

@@ -44,12 +44,22 @@ Nordata is a small collection of utility functions for accessing AWS S3 and AWS 
     - [Deleting a list of files in S3](#s3-delete-list)
     - [Deleting files matching a pattern in S3](#s3-delete-pattern)
     - [Deleting all files in a directory in S3](#s3-delete-all)
-    - [Creating a boto3 session object (experienced users)](#boto-session)
     - [Creating a bucket object (experienced users)](#get-bucket)
 
-### Testing:
-- [Testing Nordata](#nordata-testing)
+    Boto3 (experienced users):
 
+    - [Importing boto3 functions](#boto-import)
+    - [Getting boto3 credentials](#boto-creds)
+    - [Creating a boto3 session object](#boto-session)
+
+    Transferring data between Redshift and S3:
+
+    - [Transferring data from Redshift to S3](#redshift-unload)
+    - [Transferring data from S3 to Redshift](#redshift-copy)
+
+### Testing:
+
+- [Testing Nordata](#nordata-testing)
 
 <a name="pip-installing-nordata"></a>
 ## Installing Nordata:
@@ -300,13 +310,6 @@ Deleting all files in a directory in S3:
 resp = s3_delete(bucket='my_bucket', s3_filepath='tmp/*')
 ```
 
-<a name="boto-session"></a>
-Creating a boto3 session object that can be manipulated directly by experienced users:
-
-```python
-session = create_session(profile_name='default', region_name='us-west-2')
-```
-
 <a name="get-bucket"></a>
 Creating a bucket object that can be manipulated directly by experienced users:
 
@@ -317,9 +320,101 @@ bucket = s3_get_bucket(
     region_name='us-west-2')
 ```
 
+### Boto3:
+<a name="boto-import"></a>
+Importing boto3 functions:
+
+```python
+from nordata import boto_get_creds, boto_create_session
+```
+
+<a name="boto-creds"></a>
+Retrieves Boto3 credentials as a string for use in `COPY` and `UNLOAD` SQL statetments:
+
+```python
+creds = boto_get_creds(
+    profile_name='default',
+    region_name='us-west-2',
+    session=None)
+```
+
+<a name="boto-session"></a>
+Creating a boto3 session object that can be manipulated directly by experienced users:
+
+```python
+session = boto_create_session(profile_name='default', region_name='us-west-2')
+```
+
+### Transferring data between Redshift and S3:
+
+<a name="redshift-unload"></a>
+Transferring data from Redshift to S3 using an `UNLOAD` statement (see [Redshift UNLOAD documentation](https://docs.aws.amazon.com/redshift/latest/dg/r_UNLOAD.html) for more information):
+```python
+
+from nordata import boto_get_creds, redshift_execute_sql
+
+
+creds = boto_get_creds(
+    profile_name='default',
+    region_name='us-west-2',
+    session=None)
+
+sql = f'''
+
+    unload (
+        'select
+            col1
+            ,col2
+        from
+            my_schema.my_table'
+    )
+    to
+        's3://mybucket/unload/my_table/'
+    credentials
+        '{creds}'
+    parallel off header gzip allowoverwrite;
+'''
+
+redshift_execute_sql(
+    sql=sql,
+    env_var='REDSHIFT_CREDS',
+    return_data=False,
+    return_dict=False)
+```
+
+<a name="redshift-copy"></a>
+Transferring data from S3 to Redshift using a `COPY` statement (see [Redshift COPY documentation](https://docs.aws.amazon.com/redshift/latest/dg/r_COPY.html) for more information):
+```python
+
+from nordata import boto_get_creds, redshift_execute_sql
+
+
+creds = boto_get_creds(
+    profile_name='default',
+    region_name='us-west-2',
+    session=None)
+
+sql = f'''
+
+    copy
+        my_schema.my_table
+    from
+        's3://mybucket/unload/my_table/'
+    credentials
+        '{creds}'
+    ignoreheader 1 gzip;
+'''
+
+redshift_execute_sql(
+    sql=sql,
+    env_var='REDSHIFT_CREDS',
+    return_data=False,
+    return_dict=False)
+```
+
 <a name="nordata-testing"></a>
 ## Testing:
-For those interested in contributing to Nordata or forking and editing the project, pytest is the testing framework used. To run the tests, create a virtual environment, install the `dev-requirements.txt`, and run the following command from the root directory of the project. The testing scripts can be found in the test/ directory.
+For those interested in contributing to Nordata or forking and editing the project, pytest is the testing framework used. To run the tests, create a virtual environment, install the contents of `dev-requirements.txt`, and run the following command from the root directory of the project. The testing scripts can be found in the `test/` directory.
 
 ```bash
 $ pytest

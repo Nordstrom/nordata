@@ -4,7 +4,7 @@
 Nick Buker
 
 ## Introduction:
-Nordata is a small collection of utility functions for accessing AWS S3 and AWS Redshift. It was written by a data scientist on the Nordstrom Analytics Team. The goal Nordata is to be a simple, robust package to ease data work-flow. It is not intended to handle every possible need (for example credential management is largely left to the user) but it is designed to streamline common tasks.
+Nordata is a small collection of utility functions for accessing AWS S3 and AWS Redshift. It was written by a data scientist on the [Nordstrom](https://shop.nordstrom.com/) Analytics Team. The goal Nordata is to be a simple, robust package to ease data work-flow. It is not intended to handle every possible need (for example credential management is largely left to the user) but it is designed to streamline common tasks.
 
 ## Table of contents:
 
@@ -65,7 +65,7 @@ Nordata is a small collection of utility functions for accessing AWS S3 and AWS 
 ## Installing Nordata:
 Nordata can be install via pip. As always, use of a project-level virtual environment is recommended.
 
- **Nordata requires Python >= 3.6.**
+**Nordata requires Python >= 3.6.**
 
 ```bash
 $ pip install nordata
@@ -339,10 +339,11 @@ creds = boto_get_creds(
 ```
 
 <a name="boto-session"></a>
-Creating a boto3 session object that can be manipulated directly by experienced users:
+Creating a boto3 session object that can be manipulated directly by experienced users and used to access other AWS services such as Athena, DynamoDB, EMR, EC2, etc.:
 
 ```python
 session = boto_create_session(profile_name='default', region_name='us-west-2')
+athena_client = session.client('athena')
 ```
 
 ### Transferring data between Redshift and S3:

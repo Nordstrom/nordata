@@ -2,7 +2,8 @@ import boto3
 
 
 def boto_create_session(profile_name='default', region_name='us-west-2'):
-    """ Instantiates and returns a boto3 session object
+    """ Instantiates and returns a boto3 session object which can be used to create clients and
+    resources for other AWS services such as Athena, DynamoDB, EMR, EC2, etc.
 
     Parameters
     ----------
@@ -18,6 +19,7 @@ def boto_create_session(profile_name='default', region_name='us-west-2'):
     Example use
     -----------
     session = create_session(profile_name='default', region_name='us-west-2')
+    athena_client = session.client('athena')
     """
     return boto3.session.Session(profile_name=profile_name, region_name=region_name)
 
@@ -26,7 +28,7 @@ def boto_get_creds(
         profile_name='default',
         region_name='us-west-2',
         session=None):
-    """ Generates and returns an S3 credential string
+    """ Generates and returns an S3 credential string for use in Redshift COPY and UNLOAD queries
 
     Parameters
     ----------

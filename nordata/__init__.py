@@ -1,6 +1,6 @@
-'''Convenience wrappers for connecting to AWS S3 and Redshift'''
+"""Convenience wrappers for connecting to AWS S3 and Redshift"""
 
-__version__ = '0.2.2'
+__version__ = '0.2.3'
 
 
 # Boto3 function
